@@ -2,7 +2,7 @@
     "name": "@project/apptrack",
     "private": "true",
     "version": "0.0.0",
-    "workspaces": ["frontend/*", "backend/*", "python-service/*", "infra/*", "docs/*"],
+    "workspaces": ["frontend", "backend"],
     "dependencies": {
         "bun": "latest",
         "bun-types": "latest",
