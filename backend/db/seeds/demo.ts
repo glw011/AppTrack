@@ -23,16 +23,16 @@ async function seed() {
   try {
     console.log('Seeding database...');
 
-    // ── Demo user ──────────────────────────────────────────────────────────────
+    // ****** Demo Dummy User ******
     const passwordHash = await bcrypt.hash('demo1234', 10);
     await pool.query(
       `INSERT INTO users (id, email, password_hash, full_name)
-       VALUES ($1, 'demo@apptrack.dev', $2, 'Bob Boberts')
+       VALUES ($1, 'demo@apptrack.dev', $2, 'Bob Bobertson')
        ON CONFLICT (email) DO NOTHING`,
       [DEMO_USER_ID, passwordHash]
     );
 
-    // ── Companies ─────────────────────────────────────────────────────────────
+    // ****** Companies ******
     const companyIds: Record<string, string> = {};
     for (const c of companies) {
       const { rows } = await pool.query(
@@ -45,7 +45,7 @@ async function seed() {
       companyIds[c.name] = rows[0].id;
     }
 
-    // ── Job Applications ──────────────────────────────────────────────────────
+    // ****** Job Applications ******
     const applications = [
       {
         company: 'TechFlow Inc',
@@ -155,7 +155,7 @@ async function seed() {
       appIds.push(rows[0].id);
     }
 
-    // ── Notes ─────────────────────────────────────────────────────────────────
+    // ****** Notes ******
     const notes = [
       { appIndex: 0, body: 'Phone screen went well, recruiter mentioned strong TypeScript a must. Prep Node.js system design for next round.' },
       { appIndex: 0, body: 'Tech round scheduled for May 28. Reviewed their GitHub, they use Express + Postgres heavily.' },
@@ -172,7 +172,7 @@ async function seed() {
       );
     }
 
-    // ── Contacts ──────────────────────────────────────────────────────────────
+    // ****** Contacts ******
     await pool.query(
       `INSERT INTO contacts (user_id, company_id, application_id, name, email, role)
        VALUES
@@ -187,7 +187,7 @@ async function seed() {
       ]
     );
 
-    // ── Reminders ─────────────────────────────────────────────────────────────
+    // ****** Reminders ******
     await pool.query(
       `INSERT INTO reminders (application_id, user_id, message, due_at)
        VALUES

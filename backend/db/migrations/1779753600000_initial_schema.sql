@@ -23,7 +23,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- ─── Users ────────────────────────────────────────────────────────────────────
+-- ****** Users ******
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
@@ -38,7 +38,7 @@ CREATE TRIGGER trg_users_updated_at
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 
--- ─── Companies ────────────────────────────────────────────────────────────────
+-- ****** Companies ******
 CREATE TABLE companies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -58,7 +58,7 @@ CREATE TRIGGER trg_companies_updated_at
 CREATE INDEX idx_companies_user ON companies(user_id);
 
 
--- ─── Job Applications ─────────────────────────────────────────────────────────
+-- ****** Job Applications ******
 CREATE TABLE job_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -88,7 +88,7 @@ CREATE INDEX idx_applications_user_status ON job_applications(user_id, status);
 CREATE INDEX idx_applications_user_date   ON job_applications(user_id, date_applied DESC NULLS LAST);
 
 
--- ─── Contacts ─────────────────────────────────────────────────────────────────
+-- ****** Contacts ******
 CREATE TABLE contacts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -111,7 +111,7 @@ CREATE TRIGGER trg_contacts_updated_at
 CREATE INDEX idx_contacts_user ON contacts(user_id);
 
 
--- ─── Resumes ──────────────────────────────────────────────────────────────────
+-- ****** Resumes ******
 CREATE TABLE resumes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -124,7 +124,7 @@ CREATE TABLE resumes (
 CREATE INDEX idx_resumes_user ON resumes(user_id);
 
 
--- ─── Application Notes ────────────────────────────────────────────────────────
+-- ****** Application Notes ******
 CREATE TABLE application_notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   application_id UUID NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
@@ -141,7 +141,7 @@ CREATE TRIGGER trg_notes_updated_at
 CREATE INDEX idx_notes_application ON application_notes(application_id);
 
 
--- ─── Reminders ────────────────────────────────────────────────────────────────
+-- ****** Reminders ******
 CREATE TABLE reminders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   application_id UUID NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
