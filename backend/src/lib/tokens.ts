@@ -59,9 +59,23 @@ export async function validateAndConsumeToken(
 }
 
 export function verifyTokenStructure(token: string): ApprovalTokenPayload {
-  try {
+  try{
     return jwt.verify(token, process.env.JWT_SECRET!) as ApprovalTokenPayload;
-  } catch {
+  }
+  catch{
     throw new AppError(401, 'Invalid or expired approval token');
+  }
+}
+
+export function verifyUserJwt(authorizationHeader: string): string {
+  if(!authorizationHeader.startsWith('Bearer ')){
+    throw new AppError(401, 'Missing or invalid authorization header');
+  }
+  try{
+    const payload = jwt.verify(authorizationHeader.slice(7), process.env.JWT_SECRET!) as { userId: string };
+    return payload.userId;
+  }
+  catch{
+    throw new AppError(401, 'Invalid or expired token');
   }
 }

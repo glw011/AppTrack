@@ -7,10 +7,10 @@ const optionalUrl = z
   .or(z.literal(''))
   .transform(v => v || null);
 
-// Manual-entry statuses (user-managed)
+// Manual statuses (user)
 export const MANUAL_STATUSES = ['saved', 'applied', 'interviewing', 'offer', 'rejected', 'withdrawn'] as const;
 
-// Pipeline statuses (agent-managed)
+// Pipeline statuses (agent)
 export const PIPELINE_STATUSES = [
   'discovered', 'pending_draft', 'drafting', 'awaiting_approval',
   'revision_requested', 'approved', 'awaiting_submission', 'submitting', 'submitted',

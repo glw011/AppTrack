@@ -3,16 +3,16 @@
 -- ======== user_profiles ========
 -- One row per user (Arrays store capabilities used by draft agent to tailor resumes/cover letter)
 CREATE TABLE user_profiles (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id          UUID        NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  headline         VARCHAR(500),
-  summary          TEXT,
-  skills           TEXT[]      NOT NULL DEFAULT '{}',
-  technologies     TEXT[]      NOT NULL DEFAULT '{}',
-  certifications   TEXT[]      NOT NULL DEFAULT '{}',
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  headline VARCHAR(500),
+  summary TEXT,
+  skills TEXT[] NOT NULL DEFAULT '{}',
+  technologies TEXT[] NOT NULL DEFAULT '{}',
+  certifications TEXT[] NOT NULL DEFAULT '{}',
   years_experience INTEGER,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trg_user_profiles_updated_at
@@ -24,16 +24,16 @@ CREATE TRIGGER trg_user_profiles_updated_at
 -- Portfolio projects user wants available for resume
 -- highlight = TRUE: project always included regardless of job matched
 CREATE TABLE projects (
-  id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id       UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  name          VARCHAR(255) NOT NULL,
-  description   TEXT,
-  technologies  TEXT[]       NOT NULL DEFAULT '{}',
-  url           VARCHAR(500),
-  highlight     BOOLEAN      NOT NULL DEFAULT FALSE,
-  display_order INTEGER      NOT NULL DEFAULT 0,
-  created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  technologies TEXT[] NOT NULL DEFAULT '{}',
+  url VARCHAR(500),
+  highlight BOOLEAN NOT NULL DEFAULT FALSE,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trg_projects_updated_at
@@ -48,19 +48,19 @@ CREATE INDEX idx_projects_user ON projects(user_id, display_order);
 -- remote_preference: 'remote' | 'hybrid' | 'onsite' | 'any'
 -- experience_level:  'entry' | 'mid' | 'senior'
 CREATE TABLE job_search_configs (
-  id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id              UUID         NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  target_titles        TEXT[]       NOT NULL DEFAULT '{}',
-  required_keywords    TEXT[]       NOT NULL DEFAULT '{}',
-  excluded_companies   TEXT[]       NOT NULL DEFAULT '{}',
-  preferred_industries TEXT[]       NOT NULL DEFAULT '{}',
-  min_salary           INTEGER,
-  remote_preference    VARCHAR(20)  NOT NULL DEFAULT 'any',
-  location             VARCHAR(255),
-  experience_level     VARCHAR(50)  NOT NULL DEFAULT 'entry',
-  is_active            BOOLEAN      NOT NULL DEFAULT FALSE,
-  created_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  updated_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  target_titles TEXT[] NOT NULL DEFAULT '{}',
+  required_keywords TEXT[] NOT NULL DEFAULT '{}',
+  excluded_companies TEXT[] NOT NULL DEFAULT '{}',
+  preferred_industries TEXT[] NOT NULL DEFAULT '{}',
+  min_salary INTEGER,
+  remote_preference VARCHAR(20) NOT NULL DEFAULT 'any',
+  location VARCHAR(255),
+  experience_level VARCHAR(50) NOT NULL DEFAULT 'entry',
+  is_active BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trg_search_configs_updated_at
@@ -74,16 +74,16 @@ CREATE TRIGGER trg_search_configs_updated_at
 --    i.e. matched keywords, company research, summary/rationale for debugging and revision context
 -- status: 'draft' | 'awaiting_approval' | 'approved' | 'rejected'
 CREATE TABLE cover_letters (
-  id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  application_id UUID         NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
-  user_id        UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  content        TEXT         NOT NULL,
-  iteration      INTEGER      NOT NULL DEFAULT 1,
-  status         VARCHAR(50)  NOT NULL DEFAULT 'draft',
-  user_feedback  TEXT,
-  agent_context  JSONB,
-  created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  iteration INTEGER NOT NULL DEFAULT 1,
+  status VARCHAR(50) NOT NULL DEFAULT 'draft',
+  user_feedback TEXT,
+  agent_context JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trg_cover_letters_updated_at
@@ -99,18 +99,18 @@ CREATE INDEX idx_cover_letters_application ON cover_letters(application_id, iter
 -- compiled_pdf_s3_key: set after tectonic compiles LaTeX to PDF
 -- status: 'draft' | 'awaiting_approval' | 'approved' | 'rejected'
 CREATE TABLE resume_drafts (
-  id                  UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
-  application_id      UUID          NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
-  user_id             UUID          NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  base_resume_id      UUID          REFERENCES resumes(id) ON DELETE SET NULL,
-  latex_source        TEXT          NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id UUID NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  base_resume_id UUID REFERENCES resumes(id) ON DELETE SET NULL,
+  latex_source TEXT NOT NULL,
   compiled_pdf_s3_key VARCHAR(1000),
-  iteration           INTEGER       NOT NULL DEFAULT 1,
-  status              VARCHAR(50)   NOT NULL DEFAULT 'draft',
-  user_feedback       TEXT,
-  agent_context       JSONB,
-  created_at          TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-  updated_at          TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+  iteration INTEGER NOT NULL DEFAULT 1,
+  status VARCHAR(50) NOT NULL DEFAULT 'draft',
+  user_feedback TEXT,
+  agent_context JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TRIGGER trg_resume_drafts_updated_at
@@ -125,13 +125,13 @@ CREATE INDEX idx_resume_drafts_application ON resume_drafts(application_id, iter
 -- token_hash: SHA-256 of JWT so token can be invalidated without DB needing secret
 -- used_at: IS NULL = token still valid (used in partial index below)
 CREATE TABLE approval_tokens (
-  id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id        UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  application_id UUID         NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
-  token_hash     VARCHAR(255) NOT NULL UNIQUE,
-  expires_at     TIMESTAMPTZ  NOT NULL,
-  used_at        TIMESTAMPTZ,
-  created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  application_id UUID NOT NULL REFERENCES job_applications(id) ON DELETE CASCADE,
+  token_hash VARCHAR(255) NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Partial index: validation queries only care about unconsumed tokens
@@ -142,20 +142,20 @@ CREATE INDEX idx_approval_tokens_active ON approval_tokens(token_hash)
 -- ======== pipeline_runs ========
 -- Audit log for every search/draft/submission agent run
 -- component: 'search' | 'draft' | 'submission'
--- status:    'running' | 'completed' | 'failed' | 'partial'
--- metadata:  agent-specific log (e.g. { sources_checked: 3, new_jobs: 12 })
+-- status: 'running' | 'completed' | 'failed' | 'partial'
+-- metadata: agent-specific log (e.g. { sources_checked: 3, new_jobs: 12 })
 CREATE TABLE pipeline_runs (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id          UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  component        VARCHAR(50) NOT NULL,
-  status           VARCHAR(50) NOT NULL DEFAULT 'running',
-  items_processed  INTEGER     NOT NULL DEFAULT 0,
-  items_succeeded  INTEGER     NOT NULL DEFAULT 0,
-  items_failed     INTEGER     NOT NULL DEFAULT 0,
-  started_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  completed_at     TIMESTAMPTZ,
-  error_message    TEXT,
-  metadata         JSONB
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  component VARCHAR(50) NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'running',
+  items_processed INTEGER NOT NULL DEFAULT 0,
+  items_succeeded INTEGER NOT NULL DEFAULT 0,
+  items_failed INTEGER NOT NULL DEFAULT 0,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
+  error_message TEXT,
+  metadata JSONB
 );
 
 CREATE INDEX idx_pipeline_runs_user ON pipeline_runs(user_id, started_at DESC);

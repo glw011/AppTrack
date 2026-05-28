@@ -10,6 +10,7 @@ import {
   storeApprovalToken,
   validateAndConsumeToken,
   verifyTokenStructure,
+  verifyUserJwt,
 } from '../lib/tokens';
 import { sendApprovalEmail } from '../lib/email';
 import {
@@ -155,7 +156,7 @@ pipelineRouter.post(
     const { userId, jobs } = req.body;
 
     const client = await pool.connect();
-    try {
+    try{
       await client.query('BEGIN');
 
       const created: string[] = [];
@@ -205,10 +206,12 @@ pipelineRouter.post(
 
       await client.query('COMMIT');
       res.status(201).json({ created: created.length, skipped: skipped.length, ids: created });
-    } catch (err){
+    }
+    catch(err){
       await client.query('ROLLBACK');
       throw err;
-    } finally {
+    }
+    finally{
       client.release();
     }
   }),
@@ -257,7 +260,7 @@ pipelineRouter.post(
     if(!app) throw new AppError(404, 'Application not found');
 
     const client = await pool.connect();
-    try {
+    try{
       await client.query('BEGIN');
 
       // Derive next iteration numbers
@@ -311,10 +314,12 @@ pipelineRouter.post(
       });
 
       res.status(201).json({ coverLetterId: cl.id, resumeDraftId: rd.id });
-    } catch (err){
+    }
+    catch(err){
       await client.query('ROLLBACK');
       throw err;
-    } finally {
+    }
+    finally{
       client.release();
     }
   }),
@@ -345,6 +350,41 @@ pipelineRouter.get(
 );
 
 
+// ======== Draft Viewing (User auth OR reject token) ========
+
+// Called by the frontend Review page (token from email) and ApplicationDetail (user JWT).
+pipelineRouter.get(
+  '/review/:applicationId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { applicationId } = req.params;
+    const token = req.query.token as string | undefined;
+
+    // Allow access via reject token OR user JWT
+    if (token) {
+      const payload = verifyTokenStructure(token);
+      if (payload.applicationId !== applicationId) {
+        throw new AppError(403, 'Token does not match application');
+      }
+    } else {
+      // Fall back to user JWT auth
+      const header = req.headers.authorization ?? '';
+      const userId = verifyUserJwt(header);
+      const { rows } = await pool.query(
+        'SELECT id FROM job_applications WHERE id=$1 AND user_id=$2',
+        [applicationId, userId],
+      );
+      if (!rows.length) throw new AppError(404, 'Application not found');
+    }
+
+    const [clRes, rdRes] = await Promise.all([
+      pool.query('SELECT * FROM cover_letters WHERE application_id=$1 ORDER BY iteration DESC LIMIT 1', [applicationId]),
+      pool.query('SELECT * FROM resume_drafts WHERE application_id=$1 ORDER BY iteration DESC LIMIT 1', [applicationId]),
+    ]);
+    res.json({ coverLetter: clRes.rows[0] ?? null, resumeDraft: rdRes.rows[0] ?? null });
+  }),
+);
+
+
 // ======== Approval/Rejection (Approval token) ========
 
 pipelineRouter.get(
@@ -361,7 +401,7 @@ pipelineRouter.get(
     }
 
     const client = await pool.connect();
-    try {
+    try{
       await client.query('BEGIN');
 
       // Mark latest drafts as approved
@@ -393,10 +433,12 @@ pipelineRouter.get(
       );
 
       await client.query('COMMIT');
-    } catch (err){
+    }
+    catch(err){
       await client.query('ROLLBACK');
       throw err;
-    } finally {
+    }
+    finally{
       client.release();
     }
 
@@ -437,7 +479,7 @@ pipelineRouter.post(
     }
 
     const client = await pool.connect();
-    try {
+    try{
       await client.query('BEGIN');
 
       // Store feedback on the latest drafts and mark as rejected
@@ -460,10 +502,12 @@ pipelineRouter.post(
       );
 
       await client.query('COMMIT');
-    } catch (err){
+    }
+    catch(err){
       await client.query('ROLLBACK');
       throw err;
-    } finally {
+    }
+    finally{
       client.release();
     }
 

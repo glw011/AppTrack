@@ -18,13 +18,13 @@ ALTER TYPE application_status ADD VALUE IF NOT EXISTS 'submitted';          -- d
 -- FK cols for approved documents added as bare columns here
 -- Actual FK constraints added after cover_letters and resume_drafts tables created
 ALTER TABLE job_applications
-  ADD COLUMN source                     VARCHAR(20)  NOT NULL DEFAULT 'manual',
-  ADD COLUMN raw_posting                TEXT,
-  ADD COLUMN posting_fetched_at         TIMESTAMPTZ,
-  ADD COLUMN search_config_id           UUID,
-  ADD COLUMN approved_cover_letter_id   UUID,
-  ADD COLUMN approved_resume_draft_id   UUID,
-  ADD COLUMN submitted_at               TIMESTAMPTZ;
+  ADD COLUMN source VARCHAR(20)  NOT NULL DEFAULT 'manual',
+  ADD COLUMN raw_posting TEXT,
+  ADD COLUMN posting_fetched_at TIMESTAMPTZ,
+  ADD COLUMN search_config_id UUID,
+  ADD COLUMN approved_cover_letter_id UUID,
+  ADD COLUMN approved_resume_draft_id UUID,
+  ADD COLUMN submitted_at TIMESTAMPTZ;
 
 
 -- ======== resumes: LaTeX support ========
@@ -32,15 +32,15 @@ ALTER TABLE job_applications
 -- parsed_metadata caches APPTRACK tag block parsed on upload:
 --   { skills: string[], technologies: string[], highlight_projects: string[] }
 ALTER TABLE resumes
-  ADD COLUMN latex_source     TEXT,
+  ADD COLUMN latex_source TEXT,
   ADD COLUMN is_base_template BOOLEAN NOT NULL DEFAULT FALSE,
-  ADD COLUMN parsed_metadata  JSONB;
+  ADD COLUMN parsed_metadata JSONB;
 
 
 -- ======== companies: ATS platform identifiers ========
 ALTER TABLE companies
-  ADD COLUMN ats_type        VARCHAR(50),   -- 'greenhouse' | 'lever' | 'ashby' | 'workday' | 'other'
-  ADD COLUMN ats_identifier  VARCHAR(255),  -- company slug on the ATS (e.g. 'stripe' for boards.greenhouse.io/stripe)
+  ADD COLUMN ats_type VARCHAR(50),   -- 'greenhouse' | 'lever' | 'ashby' | 'workday' | 'other'
+  ADD COLUMN ats_identifier VARCHAR(255),  -- company slug on the ATS (e.g. 'stripe' for boards.greenhouse.io/stripe)
   ADD COLUMN career_page_url VARCHAR(500);
 
 
