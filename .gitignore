@@ -1,9 +1,9 @@
-# ───── Dependencies ─────
+# ===== Dependencies =====
 node_modules/
 .pnp
 .pnp.js
 
-# ───── Build outputs ─────
+# ===== Build outputs =====
 dist/
 build/
 out/
@@ -12,14 +12,15 @@ out/
 .cache/
 *.tsbuildinfo
 
-# ───── Environment & secrets ─────
+# ===== Environment & secrets =====
 .env
 .env.*
 !.env.example
 *.pem
 *.key
+docs/
 
-# ───── Python ─────
+# ===== Python =====
 __pycache__/
 *.py[cod]
 *.pyo
@@ -39,7 +40,7 @@ htmlcov/
 .coverage.*
 coverage.xml
 
-# ───── Logs ─────
+# ===== Logs =====
 *.log
 logs/
 npm-debug.log*
@@ -47,10 +48,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ───── Testing ─────
+# ===== Testing =====
 coverage/
 
-# ───── OS ─────
+# ===== OS =====
 .DS_Store
 .DS_Store?
 ._*
@@ -58,7 +59,7 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# ───── IDEs ─────
+# ===== IDEs =====
 .idea/
 *.iml
 .vscode/
@@ -68,16 +69,16 @@ Desktop.ini
 *.swo
 *~
 
-# ───── AWS / Cloud ─────
+# ===== AWS / Cloud =====
 .aws/
 *.tfstate
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
 
-# ───── Docker ─────
+# ===== Docker =====
 docker-compose.override.yml
 
-# ───── Misc ─────
+# ===== Misc =====
 *.local
 .turbo/

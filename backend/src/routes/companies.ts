@@ -10,7 +10,7 @@ export const companiesRouter = Router();
 companiesRouter.use(requireAuth);
 
 
-// ****** GET / ******
+// ======== GET / ========
 companiesRouter.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -28,7 +28,7 @@ companiesRouter.get(
 );
 
 
-// ****** POST / ******
+// ======== POST / ========
 companiesRouter.post(
   '/',
   validate(createCompanySchema),
@@ -44,7 +44,7 @@ companiesRouter.post(
 );
 
 
-// ****** GET /:id ******
+// ======== GET /:id ========
 companiesRouter.get(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
@@ -67,7 +67,7 @@ companiesRouter.get(
 );
 
 
-// ****** PUT /:id ******
+// ======== PUT /:id ========
 companiesRouter.put(
   '/:id',
   validate(updateCompanySchema),
@@ -88,7 +88,7 @@ companiesRouter.put(
 );
 
 
-// ****** DELETE /:id ******
+// ======== DELETE /:id ========
 companiesRouter.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {

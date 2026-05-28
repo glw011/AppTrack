@@ -16,7 +16,7 @@ export const applicationsRouter = Router();
 applicationsRouter.use(requireAuth);
 
 
-// ****** GET /stats ****** (def'd BEFORE /:id)
+// ======== GET /stats ======== (def'd BEFORE /:id)
 applicationsRouter.get(
   '/stats',
   asyncHandler(async (req: Request, res: Response) => {
@@ -39,7 +39,7 @@ applicationsRouter.get(
 );
 
 
-// ****** GET /export/csv ****** (def'd before /:id)
+// ======== GET /export/csv ======== (def'd before /:id)
 applicationsRouter.get(
   '/export/csv',
   asyncHandler(async (req: Request, res: Response) => {
@@ -77,7 +77,7 @@ applicationsRouter.get(
 );
 
 
-// ****** GET / ******
+// ======== GET / ========
 applicationsRouter.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -151,24 +151,24 @@ applicationsRouter.get(
 );
 
 
-// ****** POST / ******
+// ======== POST / ========
 applicationsRouter.post(
   '/',
   validate(createApplicationSchema),
   asyncHandler(async (req: Request, res: Response) => {
     const {
-      companyId, jobTitle, status, url, salaryMin, salaryMax,
+      companyId, jobTitle, status, source, url, salaryMin, salaryMax,
       location, remote, jobDescription, dateSaved, dateApplied, notes,
     } = req.body;
 
     const { rows } = await pool.query(
       `INSERT INTO job_applications
-         (user_id, company_id, job_title, status, url, salary_min, salary_max,
+         (user_id, company_id, job_title, status, source, url, salary_min, salary_max,
           location, remote, job_description, date_saved, date_applied, notes)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
        RETURNING *`,
       [
-        req.userId, companyId ?? null, jobTitle, status,
+        req.userId, companyId ?? null, jobTitle, status, source,
         url ?? null, salaryMin ?? null, salaryMax ?? null,
         location ?? null, remote, jobDescription ?? null,
         dateSaved ?? new Date().toISOString().slice(0, 10),
@@ -180,14 +180,14 @@ applicationsRouter.post(
 );
 
 
-// ****** Ownership helper function ******
+// ======== Ownership helper function ========
 async function requireOwnership(id: string, userId: string): Promise<void> {
   const { rows } = await pool.query('SELECT id FROM job_applications WHERE id = $1 AND user_id = $2', [id, userId],);
   if(rows.length === 0) throw new AppError(404, 'Application not found');
 }
 
 
-// ****** GET /:id ******
+// ======== GET /:id ========
 applicationsRouter.get(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
@@ -198,7 +198,7 @@ applicationsRouter.get(
        WHERE ja.id = $1 AND ja.user_id = $2`,
       [req.params.id, req.userId],
     );
-    if (!app) throw new AppError(404, 'Application not found');
+    if(!app) throw new AppError(404, 'Application not found');
 
     const [notesRes, contactsRes, remindersRes] = await Promise.all([
       pool.query(
@@ -225,7 +225,7 @@ applicationsRouter.get(
 );
 
 
-// ****** PUT /:id ******
+// ======== PUT /:id ========
 applicationsRouter.put(
   '/:id',
   validate(updateApplicationSchema),
@@ -233,10 +233,11 @@ applicationsRouter.put(
     await requireOwnership(req.params.id, req.userId!);
 
     const fieldMap: Record<string, string> = {
-      companyId: 'company_id',
-      jobTitle: 'job_title',
-      status: 'status',
-      url: 'url',
+      companyId:      'company_id',
+      jobTitle:       'job_title',
+      status:         'status',
+      source:         'source',
+      url:            'url',
       salaryMin: 'salary_min',
       salaryMax: 'salary_max',
       location: 'location',
@@ -269,7 +270,7 @@ applicationsRouter.put(
 );
 
 
-// ****** DELETE /:id ******
+// ======== DELETE /:id ========
 applicationsRouter.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
@@ -283,7 +284,7 @@ applicationsRouter.delete(
 );
 
 
-// ****** PATCH /:id/status ******
+// ======== PATCH /:id/status ========
 applicationsRouter.patch(
   '/:id/status',
   validate(statusPatchSchema),
@@ -300,7 +301,7 @@ applicationsRouter.patch(
 );
 
 
-// ****** POST /:id/notes ******
+// ======== POST /:id/notes ========
 applicationsRouter.post(
   '/:id/notes',
   validate(noteSchema),
@@ -316,7 +317,7 @@ applicationsRouter.post(
 );
 
 
-// ****** DELETE /:id/notes/:noteId ******
+// ======== DELETE /:id/notes/:noteId ========
 applicationsRouter.delete(
   '/:id/notes/:noteId',
   asyncHandler(async (req: Request, res: Response) => {

@@ -6,6 +6,7 @@ import { companiesRouter } from './routes/companies';
 import { contactsRouter } from './routes/contacts';
 import { remindersRouter } from './routes/reminders';
 import { resumesRouter } from './routes/resumes';
+import { pipelineRouter } from './routes/pipeline';
 import { errorHandler } from './middleware/errorHandler';
 
 export function createApp() {
@@ -22,6 +23,7 @@ export function createApp() {
   app.use('/api/contacts', contactsRouter);
   app.use('/api/reminders', remindersRouter);
   app.use('/api/resumes', resumesRouter);
+  app.use('/api/pipeline', pipelineRouter);
 
   app.use(errorHandler);
 

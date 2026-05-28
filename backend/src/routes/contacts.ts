@@ -10,7 +10,7 @@ export const contactsRouter = Router();
 contactsRouter.use(requireAuth);
 
 
-// ****** GET / ******
+// ======== GET / ========
 contactsRouter.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -43,7 +43,7 @@ contactsRouter.get(
 );
 
 
-// ****** POST / ******
+// ======== POST / ========
 contactsRouter.post(
   '/',
   validate(createContactSchema),
@@ -63,7 +63,7 @@ contactsRouter.post(
 );
 
 
-// ****** PUT /:id ******
+// ======== PUT /:id ========
 contactsRouter.put(
   '/:id',
   validate(updateContactSchema),
@@ -88,7 +88,7 @@ contactsRouter.put(
 );
 
 
-// ****** DELETE /:id ******
+// ======== DELETE /:id ========
 contactsRouter.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {

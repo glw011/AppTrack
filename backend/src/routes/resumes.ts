@@ -28,7 +28,7 @@ const BUCKET = process.env.S3_BUCKET_NAME!;
 const PRESIGNED_URL_TTL = 3600; // 1 hour
 
 
-// ****** GET / ******
+// ======== GET / ========
 resumesRouter.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -53,7 +53,7 @@ resumesRouter.get(
 );
 
 
-// ****** POST /upload ******
+// ======== POST /upload ========
 resumesRouter.post(
   '/upload',
   upload.single('resume'),
@@ -81,7 +81,7 @@ resumesRouter.post(
   }),
 );
 
-// ****** DELETE /:id ******
+// ======== DELETE /:id ========
 resumesRouter.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {

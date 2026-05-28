@@ -7,13 +7,25 @@ const optionalUrl = z
   .or(z.literal(''))
   .transform(v => v || null);
 
-export const APPLICATION_STATUSES = ['saved', 'applied', 'interviewing', 'offer', 'rejected', 'withdrawn'] as const;
+// Manual-entry statuses (user-managed)
+export const MANUAL_STATUSES = ['saved', 'applied', 'interviewing', 'offer', 'rejected', 'withdrawn'] as const;
+
+// Pipeline statuses (agent-managed)
+export const PIPELINE_STATUSES = [
+  'discovered', 'pending_draft', 'drafting', 'awaiting_approval',
+  'revision_requested', 'approved', 'awaiting_submission', 'submitting', 'submitted',
+] as const;
+
+export const APPLICATION_STATUSES = [...MANUAL_STATUSES, ...PIPELINE_STATUSES] as const;
+
+export const APPLICATION_SOURCES = ['manual', 'pipeline'] as const;
 
 export const createApplicationSchema = z
   .object({
     companyId: z.string().uuid().optional(),
     jobTitle: z.string().min(1).max(255),
     status: z.enum(APPLICATION_STATUSES).default('saved'),
+    source: z.enum(APPLICATION_SOURCES).default('manual'),
     url: optionalUrl,
     salaryMin: z.number().int().nonnegative().optional(),
     salaryMax: z.number().int().nonnegative().optional(),

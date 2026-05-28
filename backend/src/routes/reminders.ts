@@ -10,7 +10,7 @@ export const remindersRouter = Router();
 remindersRouter.use(requireAuth);
 
 
-// ****** GET / ******
+// ======== GET / ========
 remindersRouter.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
@@ -20,11 +20,11 @@ remindersRouter.get(
     const params: unknown[] = [req.userId];
     let p = 2;
 
-    if (applicationId) {
+    if(applicationId){
       conditions.push(`r.application_id = $${p++}`);
       params.push(applicationId);
     }
-    if (completed !== undefined) {
+    if(completed !== undefined){
       conditions.push(`r.completed = $${p++}`);
       params.push(completed === 'true');
     }
@@ -43,7 +43,7 @@ remindersRouter.get(
 );
 
 
-// ****** POST / ******
+// ======== POST / ========
 remindersRouter.post(
   '/',
   validate(createReminderSchema),
@@ -55,7 +55,7 @@ remindersRouter.post(
       'SELECT id FROM job_applications WHERE id = $1 AND user_id = $2',
       [applicationId, req.userId],
     );
-    if (!app) throw new AppError(404, 'Application not found');
+    if(!app) throw new AppError(404, 'Application not found');
 
     const { rows } = await pool.query(
       `INSERT INTO reminders (application_id, user_id, message, due_at)
@@ -67,7 +67,7 @@ remindersRouter.post(
 );
 
 
-// ****** PATCH /:id/complete ******
+// ======== PATCH /:id/complete ========
 remindersRouter.patch(
   '/:id/complete',
   asyncHandler(async (req: Request, res: Response) => {
@@ -78,13 +78,13 @@ remindersRouter.patch(
        RETURNING *`,
       [req.params.id, req.userId],
     );
-    if (rows.length === 0) throw new AppError(404, 'Reminder not found or already completed');
+    if(rows.length === 0) throw new AppError(404, 'Reminder not found or already completed');
     res.json(rows[0]);
   }),
 );
 
 
-// ****** DELETE /:id ******
+// ======== DELETE /:id ========
 remindersRouter.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
@@ -92,7 +92,7 @@ remindersRouter.delete(
       'DELETE FROM reminders WHERE id = $1 AND user_id = $2',
       [req.params.id, req.userId],
     );
-    if (!rowCount) throw new AppError(404, 'Reminder not found');
+    if(!rowCount) throw new AppError(404, 'Reminder not found');
     res.status(204).send();
   }),
 );
